@@ -3629,14 +3629,14 @@ class Mosaic(BaseOperator):
 
         # random translation
         translate = random.uniform(translates[0], translates[1])
-        translation_x = translate * input_dim[0]
-        translation_y = translate * input_dim[1]
+        translation_x = translate * input_dim[1]
+        translation_y = translate * input_dim[0]
         M[0, 2] = translation_x
         M[1, 2] = translation_y
 
         # warpAffine
         img = cv2.warpAffine(
-            img, M, dsize=tuple(input_dim), borderValue=(114, 114, 114))
+            img, M, dsize=(input_dim[1], input_dim[0]), borderValue=(114, 114, 114))
 
         num_gts = len(labels)
         if num_gts > 0:
@@ -3656,8 +3656,8 @@ class Mosaic(BaseOperator):
             new_bboxes = new_bboxes.reshape(4, num_gts).T
 
             # clip boxes
-            new_bboxes[:, 0::2] = np.clip(new_bboxes[:, 0::2], 0, input_dim[0])
-            new_bboxes[:, 1::2] = np.clip(new_bboxes[:, 1::2], 0, input_dim[1])
+            new_bboxes[:, 0::2] = np.clip(new_bboxes[:, 0::2], 0, input_dim[1])
+            new_bboxes[:, 1::2] = np.clip(new_bboxes[:, 1::2], 0, input_dim[0])
             labels[:, :4] = new_bboxes
 
         return img, labels
